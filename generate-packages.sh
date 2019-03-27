@@ -55,14 +55,6 @@ do
 
   TO_EXTRACT=`sed -n -e '/'"  $COMPANY"'/,/;;/ p' $EXTRACT_LIST_FILENAME | tail -n+3 | head -n-2 | sed -e 's/\\\//g'`
 
-  # Check if TO_EXTRACT list has any APK files
-  if [[ ${TO_EXTRACT} == *.apk* ]]
-  then
-    APK_MAKEFILE=${FILEDIR}/Android.mk
-    echo "LOCAL_PATH := \$(call my-dir)" > ${APK_MAKEFILE}
-    echo "" >> ${APK_MAKEFILE}
-  fi
-
   echo \ \ Extracting files from OTA package
   for ONE_FILE in $TO_EXTRACT
   do
@@ -84,36 +76,6 @@ do
       FILEDIR_NEW=$FILEDIR
     fi
 
-    # apk makefile
-    if [[ ${ONE_FILE} == *.apk ]]
-    then
-      TMP_ONE_FILE_NAME=$(basename ${ONE_FILE} | sed 's/.apk//g')
-
-      echo "include \$(CLEAR_VARS)" >> ${APK_MAKEFILE}
-
-      echo "LOCAL_MODULE_SUFFIX := \$(COMMON_ANDROID_PACKAGE_SUFFIX)" >> ${APK_MAKEFILE}
-      echo "LOCAL_MODULE := ${TMP_ONE_FILE_NAME}" >> ${APK_MAKEFILE}
-      echo "LOCAL_MODULE_TAGS := optional" >> ${APK_MAKEFILE}
-      echo "LOCAL_BUILT_MODULE_STEM := package.apk" >> ${APK_MAKEFILE}
-      echo "LOCAL_MODULE_OWNER := ${COMPANY}" >> ${APK_MAKEFILE}
-      echo "LOCAL_MODULE_CLASS := APPS" >> ${APK_MAKEFILE}
-      echo "LOCAL_SRC_FILES := \$(LOCAL_MODULE).apk" >> ${APK_MAKEFILE}
-      echo "LOCAL_CERTIFICATE := PRESIGNED" >> ${APK_MAKEFILE}
-
-      if [[ ${ONE_FILE} == *priv-app/* ]]
-      then
-        echo "LOCAL_PRIVILEGED_MODULE := true" >> ${APK_MAKEFILE}
-      fi
-
-      if [[ ${TMP_ONE_FILE_NAME} == "LeanbackLauncher" ]]
-      then
-        echo "LOCAL_OVERRIDES_PACKAGES := Launcher2" >> ${APK_MAKEFILE}
-      fi
-
-      echo "include \$(BUILD_PREBUILT)" >> ${APK_MAKEFILE}
-      echo "" >> ${APK_MAKEFILE}
-    fi
-
     echo \ \ \ \ Extracting $ONE_FILE
     unzip -j -o $ZIP $ONE_FILE -d $FILEDIR_NEW> /dev/null || echo \ \ \ \ Error extracting $ONE_FILE
     if test ${ONE_FILE,,} = system/vendor/bin/gpsd -o ${ONE_FILE,,} = system/vendor/bin/pvrsrvinit -o ${ONE_FILE,,} = system/bin/fRom
@@ -122,15 +84,6 @@ do
     fi
 
     ONE_FILE_BASE=$(basename $ONE_FILE)
-    if [[ $ONE_FILE_BASE == *atmel-a432-*-shamu-p1.tdat ]]
-    then
-      ATMEL_FILE=$(ls $FILEDIR_NEW/$ONE_FILE_BASE | cut -f6 -d'/')
-      sed -i "s/$ONE_FILE_BASE/$ATMEL_FILE/" moto/staging/device-partial.mk
-    elif [[ $ONE_FILE_BASE == *atmel-a432-*-shamu.tdat ]]
-    then
-      ATMEL_FILE=$(ls $FILEDIR_NEW/$ONE_FILE_BASE | cut -f6 -d'/')
-      sed -i "s/$ONE_FILE_BASE/$ATMEL_FILE/" moto/staging/device-partial.mk
-    fi
 
     # Sanity check to make sure apk or jar files are not stripped
     if [[ ${ONE_FILE_BASE} == *.apk ]] || [[ ${ONE_FILE_BASE} == *.jar ]]
@@ -189,6 +142,19 @@ do
     # Move device-vendor-sargo.mk under bonito directory so that it can
     # be inherited by device/google/bonito/aosp_sargo.mk
     mv ${FILEDIR_ROOT}/proprietary/device-vendor.mk ${FILEDIR_ROOT_SHARE}
+  fi
+
+  if [[ ${COMPANY} == qcom ]]
+  then
+    case ${ROOTDEVICE} in
+      marlin|sailfish|taimen|walleye|crosshatch|blueline|bonito|sargo)
+        if [[ -e "${MAKEFILEDIR}/Android.mk" ]]
+        then
+          mv ${MAKEFILEDIR}/Android.mk ${FILEDIR}/
+        fi
+         ;;
+      *) ;;
+    esac
   fi
 
   echo \ \ Generating self-extracting script
