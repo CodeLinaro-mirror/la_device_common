@@ -95,6 +95,8 @@ do
     fi
 
   done
+  echo \ \ Copying $COMPANY-specific LICENSE
+  cp $COMPANY/LICENSE ${MAKEFILEDIR} || echo \ \ \ \ Error copying LICENSE
   echo \ \ Setting up $COMPANY-specific makefiles
   cp -R $COMPANY/staging/* $MAKEFILEDIR || echo \ \ \ \ Error copying makefiles
   echo \ \ Setting up shared makefiles
@@ -153,12 +155,9 @@ do
     mv ${FILEDIR_ROOT}/proprietary/device-vendor.mk ${FILEDIR_ROOT_SHARE}
   fi
 
-  if [[ ${COMPANY} == qcom ]]
+  if [[ -e "${MAKEFILEDIR}/Android.mk" ]]
   then
-    if [[ -e "${MAKEFILEDIR}/Android.mk" ]]
-    then
-      mv ${MAKEFILEDIR}/Android.mk ${FILEDIR}/
-    fi
+    mv ${MAKEFILEDIR}/Android.mk ${FILEDIR}/
   fi
 
   echo \ \ Generating self-extracting script
