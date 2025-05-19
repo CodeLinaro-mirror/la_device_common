@@ -6,7 +6,7 @@
 
 ###############################################################################################
 # This is the script to generate split PIL bins for Gunyah hypervisor                         #
-# Need to run this script from the device/qcom/kalama_gvm_gy directory                         #
+# Need to run this script from the device/qcom/kalama_gvm_gy directory                        #
 # Before running this script full android build should be done and below directory is present #
 # device/qcom/msmnile-kernel with dtbs and Image present in the directory                     #
 ###############################################################################################
@@ -16,19 +16,19 @@ PWD=`pwd`;
 PIL_PATH="$PWD"
 #echo "$PIL_PATH"
 ROOT_DIR="$PWD/../../../"
-#echo "$ROOT_DIR"
+echo "$ROOT_DIR"
 MKDTBOIMGPY_PATH=$ROOT_DIR/system/libufdt/utils/src
-#echo "$MKDTBOIMGPY_PATH"
+echo "$MKDTBOIMGPY_PATH"
 IMG_PATH="$PWD/../kalama-kernel"
-#echo "$IMG_PATH"
+echo "$IMG_PATH"
 cd $IMG_PATH
 OUTPATH="$PWD/../../../out/target/product/kalama_gvm_gy"
-#echo "$OUTPATH"
+echo "$OUTPATH"
 if [[ -z "${QCPATH}" ]]; then
 	echo "ERROR: QCPATH is empty and must be set for all vendor references"
 	exit 1
 fi
-#echo "$QCPATH"
+echo "$QCPATH"
 SECURITY_PROFILE_PATH="$QCPATH/securemsm/security_profiles"
 cd $OUTPATH
 # Create scratch folder to copy the images for creating split PIL images
@@ -50,8 +50,8 @@ else
 fi
 
 cp $IMG_PATH/Image $OUTPATH/scratch/
-cp $OUTPATH/ramdisk.img $OUTPATH/scratch/
-cp $QCPATH/guest-bootloader/FVMAIN_COMPACT.Fv $OUTPATH/scratch/
+cp $OUTPATH/vendor_ramdisk.img $OUTPATH/scratch/ramdisk.img
+
 cd $OUTPATH/scratch
 
 python3 $PIL_PATH/image_header.py trustedvm-boot.elf Image,0x0 \

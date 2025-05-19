@@ -1,3 +1,5 @@
+LOCAL_PATH := $(call my-dir)
+
 $(shell rm WORKSPACE)
 $(shell ln -s build/bazel/bazel.WORKSPACE WORKSPACE)
 
