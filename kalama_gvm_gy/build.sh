@@ -6,11 +6,11 @@
 #set -x
 
 cleanup() {
-    printf "Received INT....Stopping root build script"
+    printf "Received ERR/INT....Exiting build.sh\n"
     exit 1
 }
 
-trap cleanup INT
+trap cleanup INT ERR
 
 build_kernel_only () {
     if [ "${RECOMPILE_KERNEL}" == "1" ]; then
@@ -38,17 +38,17 @@ build_ghgvm-pilsplitter () {
 }
 
 if ! build_kernel_only; then
-    printf "Error building kernel...ending build"
+    printf "Error building kernel...ending build\n"
     exit 1
 fi
 
 if ! build_platform_only; then
-    printf "Error building platform...ending build"
+    printf "Error building platform...ending build\n"
     exit 1
 fi
 
 # Disabled until proper component are integrated in the manifest
 # if ! build_ghgvm-pilsplitter; then
-#     printf "Error building pilsplitter...ending build"
+#     printf "Error building pilsplitter...ending build\n"
 #     exit 1
 # fi
