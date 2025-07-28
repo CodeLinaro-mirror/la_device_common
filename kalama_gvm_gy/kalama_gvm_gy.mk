@@ -1,6 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
-$(shell rm WORKSPACE)
+$(shell rm -f WORKSPACE)
 $(shell ln -s build/bazel/bazel.WORKSPACE WORKSPACE)
 
 include device/google/trout/aosp_trout_arm64.mk
