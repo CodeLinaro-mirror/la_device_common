@@ -47,8 +47,7 @@ if ! build_platform_only; then
     exit 1
 fi
 
-# Disabled until proper component are integrated in the manifest
-# if ! build_ghgvm-pilsplitter; then
-#     printf "Error building pilsplitter...ending build\n"
-#     exit 1
-# fi
+if ! build_ghgvm-pilsplitter; then
+    printf "Error building pilsplitter...ending build\n"
+    exit 1
+fi
